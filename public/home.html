@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logged in</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+</head>
+<body>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/login.html">Login</a>
+  </nav>
+  <h1>Logged-in page</h1>
+  <p class="hint">API: POST /api/auth/logout &nbsp;|&nbsp; Socket event: force_logout</p>
+
+  <div class="box">
+    <p id="userInfo">Loading...</p>
+    <button id="logoutBtn" type="button">Logout</button>
+  </div>
+
+  <pre id="log"></pre>
+  <script src="/js/api.js"></script>
+  <script>
+    const token = getToken();
+    if (!token) {
+      window.location.href = "/login.html";
+    }
+
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    document.getElementById("userInfo").textContent = user
+      ? "User: " + user.name + " (" + user.email + ")"
+      : "Token saved. Socket will connect.";
+
+    let socket;
+    if (typeof io !== "undefined") {
+      socket = io({ auth: { token: token } });
+      socket.on("connect", function () {
+        log("Socket connected", "ok");
+      });
+      socket.on("force_logout", function (payload) {
+        clearSession();
+        alert(payload.message);
+        window.location.href = "/login.html";
+      });
+      socket.on("connect_error", function (err) {
+        log("Socket error: " + err.message, "err");
+      });
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", async function () {
+      const result = await api("/api/auth/logout", { method: "POST" });
+      clearSession();
+      if (socket) socket.disconnect();
+      alert(result.data.message || "Logged out");
+      window.location.href = "/login.html";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <h1>Session Management</h1>
+  <p class="hint">Open these pages on http://localhost:3000 (not as a file).</p>
+  <nav>
+    <a href="/register.html">Register</a>
+    <a href="/login.html">Login</a>
+    <a href="/home.html">Logged-in page</a>
+  </nav>
+  <div class="box">
+    <p><b>Flow</b></p>
+    <ol>
+      <li>Register page → POST /api/auth/register</li>
+      <li>Login page → POST /api/auth/login</li>
+      <li>If already logged in elsewhere → 409, use Force login</li>
+      <li>After login popup → go to logged-in page</li>
+      <li>Logged-in page connects socket and waits for force_logout</li>
+    </ol>
+  </div>
+</body>
+</html>
